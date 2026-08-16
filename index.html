@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>学習クイズアプリ</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+
+            <h1>学習クイズアプリ</h1>
+
+            <p class="subtitle">
+                個人学習用クイズシステム
+            </p>
+
+        </header>
+
+        <!-- フィルターエリア -->
+
+        <section class="filter-area">
+
+            <h2>出題条件</h2>
+
+            <div class="filter-group">
+
+                <label for="searchText">
+                    問題検索
+                </label>
+
+                <input
+                    type="text"
+                    id="searchText"
+                    placeholder="キーワードを入力">
+
+            </div>
+
+            <div class="filter-group">
+
+                <label for="categoryFilter">
+                    カテゴリ
+                </label>
+
+                <select id="categoryFilter">
+
+                    <option value="">
+                        すべて
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="filter-group">
+
+                <label for="tagFilter">
+                    試験
+                </label>
+
+                <select id="tagFilter">
+
+                    <option value="">
+                        すべて
+                    </option>
+
+                    <option value="AZ-104">
+                        AZ-104
+                    </option>
+
+                    <option value="AZ-900">
+                        AZ-900
+                    </option>
+
+                    <option value="PowerShell">
+                        PowerShell
+                    </option>
+
+                    <option value="ネットワーク">
+                        ネットワーク
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="filter-group">
+
+                <label for="difficultyFilter">
+                    難易度
+                </label>
+
+                <select id="difficultyFilter">
+
+                    <option value="">
+                        すべて
+                    </option>
+
+                    <option value="1">
+                        ★1 初級
+                    </option>
+
+                    <option value="2">
+                        ★2 初中級
+                    </option>
+
+                    <option value="3">
+                        ★3 中級
+                    </option>
+
+                    <option value="4">
+                        ★4 上級
+                    </option>
+
+                    <option value="5">
+                        ★5 最難関
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="checkbox-area">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        id="favoriteOnly">
+
+                    お気に入りのみ
+
+                </label>
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        id="incorrectOnly">
+
+                    間違えた問題のみ
+
+                </label>
+
+            </div>
+
+        </section>
+
+        <!-- 学習統計 -->
+
+        <section
+            id="statsArea"
+            class="stats-area">
+
+            <h2>学習統計</h2>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        総回答数
+                    </div>
+
+                    <div
+                        id="totalAnswer"
+                        class="stat-value">
+
+                        0
+
+                    </div>
+
+                </div>
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        総正解数
+                    </div>
+
+                    <div
+                        id="totalCorrect"
+                        class="stat-value">
+
+                        0
+
+                    </div>
+
+                </div>
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        総不正解数
+                    </div>
+
+                    <div
+                        id="totalIncorrect"
+                        class="stat-value">
+
+                        0
+
+                    </div>
+
+                </div>
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        正答率
+                    </div>
+
+                    <div
+                        id="accuracy"
+                        class="stat-value">
+
+                        0%
+
+                    </div>
+
+                </div>
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        お気に入り
+                    </div>
+
+                    <div
+                        id="favoriteCount"
+                        class="stat-value">
+
+                        0
+
+                    </div>
+
+                </div>
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        苦手問題
+                    </div>
+
+                    <div
+                        id="weakCount"
+                        class="stat-value">
+
+                        0
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- クイズエリア -->
+
+        <section
+            id="quizArea"
+            class="quiz-area">
+
+            <div class="quiz-header">
+
+                <div
+                    id="category"
+                    class="category">
+
+                    カテゴリ
+
+                </div>
+
+                <div
+                    id="difficulty"
+                    class="difficulty">
+
+                    難易度
+
+                </div>
+
+            </div>
+
+            <div
+                id="questionCounter"
+                class="question-counter">
+
+                問題番号
+
+            </div>
+
+            <h2
+                id="question"
+                class="question">
+
+                問題文
+
+            </h2>
+
+            <div
+                id="choices"
+                class="choices">
+
+            </div>
+
+            <div
+                id="result"
+                class="result">
+
+            </div>
+
+            <div
+                id="explanation"
+                class="explanation">
+
+            </div>
+
+            <div class="button-group">
+
+                <button id="favoriteBtn">
+
+                    ☆ お気に入り
+
+                </button>
+
+                <button id="nextBtn">
+
+                    次の問題
+
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- 模擬試験エリア -->
+
+        <section class="exam-area">
+
+            <h2>
+                模擬試験モード
+            </h2>
+
+            <p>
+                ランダムに20問出題します。
+            </p>
+
+            <button id="startExamBtn">
+
+                模擬試験開始
+
+            </button>
+
+            <div
+                id="examStatus"
+                class="exam-status">
+
+            </div>
+
+            <div
+                id="examResult"
+                class="exam-result">
+
+            </div>
+
+        </section>
+
+        <!-- フッター -->
+
+        <footer>
+
+            <hr>
+
+            <small>
+
+                Personal Quiz System
+
+            </small>
+
+        </footer>
+
+    </div>
+
+    <script src="questions.js"></script>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
