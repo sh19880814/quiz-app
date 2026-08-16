@@ -424,3 +424,13 @@ footer {
         padding: 12px;
     }
 }
+
+.question-count {
+    margin-bottom: 15px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+    font-weight: bold;
+}

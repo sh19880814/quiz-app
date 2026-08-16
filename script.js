@@ -12,6 +12,10 @@ let examIndex = 0;
 
 let examCorrect = 0;
 
+let sessionCorrect = 0;
+
+let sessionIncorrect = 0;
+
 /* ==========================
    LocalStorage
 ========================== */
@@ -187,20 +191,13 @@ function selectRandomQuestion(
             )
         );
 
-    if (
-        candidates.length === 0
-    ) {
+if (
+    candidates.length === 0
+) {
 
-        askedQuestions = [];
+    return null;
 
-        return questions[
-            Math.floor(
-                Math.random()
-                *
-                questions.length
-            )
-        ];
-    }
+}
 
     const question =
         candidates[
@@ -251,14 +248,112 @@ function loadQuestion() {
         return;
     }
 
-    currentQuestion =
-        selectRandomQuestion(
-            filtered
-        );
+	currentQuestion =
+	    selectRandomQuestion(
+	        filtered
+	    );
 
-    renderQuestion(
-        currentQuestion
-    );
+	if (
+	    currentQuestion === null
+	) {
+
+	    const total =
+	        sessionCorrect +
+	        sessionIncorrect;
+
+	    const score =
+	        total === 0
+	        ? 0
+	        : (
+	            sessionCorrect /
+	            total *
+	            100
+	        ).toFixed(1);
+
+	    document.getElementById(
+	        "question"
+	    ).innerHTML =
+	        "学習完了！ お疲れさまでした！";
+
+	    document.getElementById(
+	        "choices"
+	    ).innerHTML =
+	        "";
+
+	    document.getElementById(
+	        "result"
+	    ).innerHTML =
+	        `
+	        <h3>今回の結果</h3>
+
+	        正解数：${sessionCorrect}<br>
+
+	        不正解数：${sessionIncorrect}<br>
+
+	        正答率：${score}%
+	        `;
+
+	    document.getElementById(
+	        "explanation"
+	    ).innerHTML =
+	        "";
+
+	    document.getElementById(
+	        "questionCounter"
+	    ).textContent =
+	        `${filtered.length} / ${filtered.length}`;
+
+		document.getElementById(
+		    "nextBtn"
+		).style.display =
+		    "none";
+
+		document.getElementById(
+		    "favoriteBtn"
+		).style.display =
+		    "none";
+
+		document.getElementById(
+		    "restartBtn"
+		).style.display =
+		    "block";
+
+	    return;
+	}
+
+	renderQuestion(
+	    currentQuestion
+	);
+
+	updateProgress();
+
+}
+
+function restartQuiz() {
+
+    askedQuestions = [];
+
+    sessionCorrect = 0;
+
+    sessionIncorrect = 0;
+
+    document.getElementById(
+        "restartBtn"
+    ).style.display =
+        "none";
+
+    document.getElementById(
+        "nextBtn"
+    ).style.display =
+        "block";
+
+    document.getElementById(
+        "favoriteBtn"
+    ).style.display =
+        "block";
+
+    loadQuestion();
+
 }
 
 /* ==========================
@@ -381,6 +476,8 @@ function checkAnswer(
 
         history[id].correct++;
 
+        sessionCorrect++;
+
         resultArea.textContent =
             "〇 正解";
 
@@ -397,8 +494,10 @@ function checkAnswer(
 
         history[id].incorrect++;
 
+        sessionIncorrect++;
+
         resultArea.textContent =
-            "? 不正解";
+            "× 不正解";
 
         resultArea.className =
             "result incorrect";
@@ -805,6 +904,38 @@ document
         loadQuestion
     );
 
+document
+    .getElementById(
+        "restartBtn"
+    )
+    .addEventListener(
+        "click",
+        restartQuiz
+    );
+
+/* ==========================
+   問題数表示
+========================== */
+function updateQuestionCount() {
+
+    document.getElementById(
+        "totalQuestionCount"
+    ).textContent =
+
+        `登録問題数 : ${quizData.length}問`;
+
+}
+
+function updateProgress() {
+
+    document.getElementById(
+        "questionCounter"
+    ).textContent =
+
+        `現在位置 : ${askedQuestions.length} / ${quizData.length}`;
+
+}
+
 /* ==========================
    初期化
 ========================== */
@@ -813,4 +944,8 @@ initializeCategories();
 
 updateStatistics();
 
+updateQuestionCount();
+
 loadQuestion();
+
+
