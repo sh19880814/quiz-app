@@ -434,3 +434,56 @@ footer {
 
     font-weight: bold;
 }
+
+.explanation-text {
+
+    margin-bottom: 15px;
+
+}
+
+.explanation-image {
+
+    display: block;
+
+    margin-top: 10px;
+
+    width: 100%;
+
+    max-width: 700px;
+
+    border-radius: 8px;
+
+}
+
+.choice-image {
+
+    width: 100%;
+
+    max-width: 250px;
+
+    height: auto;
+
+    display: block;
+
+    margin: 0 auto;
+
+    border-radius: 8px;
+
+}
+
+
+.question-image {
+
+    width: 100%;
+
+    max-width: 700px;
+
+    display: block;
+
+    margin-top: 15px;
+
+    border-radius: 8px;
+
+    border: 1px solid #cccccc;
+
+}
