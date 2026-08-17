@@ -487,3 +487,35 @@ footer {
     border: 1px solid #cccccc;
 
 }
+
+.choice-explanation-image {
+
+    width: 100%;
+
+    max-width: 500px;
+
+    margin-top: 5px;
+
+    margin-bottom: 10px;
+
+    border-radius: 8px;
+
+    border: 1px solid #cccccc;
+
+}
+
+.correct-choice {
+
+    background-color: #16a34a !important;
+
+    color: white;
+
+}
+
+.wrong-choice {
+
+    background-color: #dc2626 !important;
+
+    color: white;
+
+}

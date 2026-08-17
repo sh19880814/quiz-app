@@ -471,8 +471,11 @@ function renderQuestion(
             () => Math.random() - 0.5
         );
 
+	currentQuestion.shuffledChoices =
+	    shuffledChoices;
+
 shuffledChoices.forEach(
-    choice => {
+    (choice, index) => {
 
         const button =
             document.createElement(
@@ -515,7 +518,8 @@ shuffledChoices.forEach(
             "click",
             () =>
             checkAnswer(
-                choice.value
+                choice,
+                index
             )
         );
 
@@ -535,7 +539,8 @@ shuffledChoices.forEach(
 ========================== */
 
 function checkAnswer(
-    selectedChoice
+    selectedChoice,
+    selectedIndex
 ) {
 
     if (
@@ -558,6 +563,44 @@ function checkAnswer(
         btn.disabled = true;
 
     });
+
+	buttons.forEach((btn, index) => {
+
+	    const displayedChoice =
+	        currentQuestion.shuffledChoices[
+	            index
+	        ];
+
+	    const correctChoice =
+	        currentQuestion.choices[
+	            currentQuestion.answerIndex
+	        ];
+
+	    if (
+	        displayedChoice.value ===
+	        correctChoice.value
+	    ) {
+
+	        btn.classList.add(
+	            "correct-choice"
+	        );
+
+	    }
+
+	    if (
+	        displayedChoice.value ===
+	        selectedChoice.value &&
+	        displayedChoice.value !==
+	        correctChoice.value
+	    ) {
+
+	        btn.classList.add(
+	            "wrong-choice"
+	        );
+
+	    }
+
+	});
 
     const history =
         getHistory();
@@ -591,9 +634,28 @@ function checkAnswer(
             "explanation"
         );
 
-    const isCorrect =
-        selectedChoice ===
-        currentQuestion.answer;
+	const isCorrect =
+	    selectedChoice.value ===
+	    currentQuestion.choices[
+	        currentQuestion.answerIndex
+	    ].value;
+
+	const correctChoice =
+	    currentQuestion.choices[
+	        currentQuestion.answerIndex
+	    ];
+
+	const correctDisplayedIndex =
+	    currentQuestion.shuffledChoices
+	        .findIndex(
+	            c =>
+	                c.value ===
+	                correctChoice.value
+	        );
+
+	const correctNumber =
+	    correctDisplayedIndex + 1;
+
 
     if (isCorrect) {
 
@@ -621,19 +683,115 @@ function checkAnswer(
 
     }
 
-	explanationArea.innerHTML =
-	    `
-	    <strong>正解：</strong>
-	    ${currentQuestion.answer}
-	    <br><br>
+	let html = "";
 
-	    <div class="explanation-text">
-	        ${currentQuestion.explanation}
-	    </div>
-	    `;
+	html +=
+	    "あなたの回答 : " +
+	    (selectedIndex + 1) +
+	    "番<br><br>";
+
+	html +=
+	    "正解 : " +
+	    correctNumber +
+	    "番<br><br>";
+
+	html +=
+	    "<strong>各選択肢の解説</strong><br><br>";
+
+
+
+	currentQuestion.shuffledChoices
+	.forEach(
+	    (choice, index) => {
+
+	        const hasExplanation =
+	            choice.explanation &&
+	            choice.explanation.trim() !== "";
+
+	        const hasImage =
+	            choice.explanationImage &&
+	            choice.explanationImage.trim() !== "";
+
+	        if (
+	            !hasExplanation &&
+	            !hasImage
+	        ) {
+
+	            return;
+
+	        }
+
+	        html +=
+	            `<div id="choice-exp-${index}">`;
+
+	        html +=
+	            "【" +
+	            (index + 1) +
+	            "番】<br>";
+
+	        if (hasExplanation) {
+
+	            html +=
+	                choice.explanation +
+	                "<br>";
+
+	        }
+
+	        html +=
+	            "</div><br>";
+
+	    }
+	);
+
+	explanationArea.innerHTML =
+	    html;
+
+	currentQuestion.shuffledChoices
+	.forEach(
+	    (choice, index) => {
+
+	        if (
+	            choice.explanationImage &&
+	            choice.explanationImage.trim() !== ""
+	        ) {
+
+	            const parent =
+	                document.getElementById(
+	                    `choice-exp-${index}`
+	                );
+
+	            if (!parent) {
+
+	                return;
+
+	            }
+
+	            const img =
+	                document.createElement(
+	                    "img"
+	                );
+
+	            img.src =
+	                choice.explanationImage;
+
+	            img.className =
+	                "choice-explanation-image";
+
+	            img.alt =
+	                "選択肢解説画像";
+
+	            parent.appendChild(
+	                img
+	            );
+
+	        }
+
+	    }
+	);
 
 	if (
-	    currentQuestion.explanationImage
+	    currentQuestion.explanationImage &&
+	    currentQuestion.explanationImage.trim() !== ""
 	) {
 
 	    const img =
@@ -651,11 +809,16 @@ function checkAnswer(
 	        "解説画像";
 
 	    explanationArea.appendChild(
+	        document.createElement(
+	            "hr"
+	        )
+	    );
+
+	    explanationArea.appendChild(
 	        img
 	    );
 
 	}
-
 
 
     saveHistory(
@@ -663,6 +826,25 @@ function checkAnswer(
     );
 
     updateStatistics();
+
+}
+
+function getDisplayedAnswerNumber() {
+
+    const correctChoice =
+        currentQuestion.choices[
+            currentQuestion.answerIndex
+        ];
+
+    const displayedIndex =
+        currentQuestion.shuffledChoices
+            .findIndex(
+                choice =>
+                    choice.value ===
+                    correctChoice.value
+            );
+
+    return displayedIndex + 1;
 
 }
 
