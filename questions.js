@@ -35,7 +35,7 @@ const quizData = [
         {type:"text", value:"らっこ", explanation:"", explanationImage:"images/rakko.png"}
     ],
     answerIndex: 2,
-    explanationImage: "images/tiikawa.png"
+    explanationImage: "images/hatiware.png"
 }
 
 ];
