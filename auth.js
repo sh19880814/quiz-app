@@ -3,7 +3,7 @@
 // ==========================
 
 // ‡@ Supabase ‚Ì Project URL ‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢
-const SUPABASE_URL = "https://sh19880814.github.io/quiz-app";
+const SUPABASE_URL = "https://jtsdpgujzyxnsfagsuim.supabase.co";
 
 // ‡A Supabase ‚Ì Publishable keyisb_publishable_...j‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_H9an-6TYw32f18GDAqR-mA_3HZ3Db_N";
