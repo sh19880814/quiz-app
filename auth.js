@@ -70,6 +70,11 @@ async function protectQuizPage() {
         return;
     }
 
+    // 認証確認が成功したら画面を表示
+	document.documentElement.classList.remove(
+	    "auth-checking"
+	);
+
 
     // ログイン中メールアドレス表示
     const userEmail =
