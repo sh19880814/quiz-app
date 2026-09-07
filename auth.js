@@ -43,46 +43,35 @@ async function protectQuizPage() {
     if (
         currentPage !== "index.html"
     ) {
-
         return;
-
     }
 
+    // Supabaseサーバー側で
+    // 本当にユーザーが存在するか確認
     const {
-        data: { session },
+        data: { user },
         error
     } =
-        await supabaseClient.auth.getSession();
+        await supabaseClient.auth.getUser();
 
 
-    if (error) {
+    // ユーザー削除済み・セッション無効など
+    if (error || !user) {
 
-        console.error(
-            "セッション確認エラー:",
-            error.message
-        );
-
-        window.location.replace(
-            "login.html"
-        );
-
-        return;
-
-    }
-
-
-    if (!session) {
+        // ブラウザに残った古いセッションも削除
+        await supabaseClient.auth.signOut({
+            scope: "local"
+        });
 
         window.location.replace(
             "login.html"
         );
 
         return;
-
     }
 
 
-    // ログイン中のメールアドレス表示
+    // ログイン中メールアドレス表示
     const userEmail =
         document.getElementById(
             "userEmail"
@@ -91,7 +80,7 @@ async function protectQuizPage() {
     if (userEmail) {
 
         userEmail.textContent =
-            session.user.email ?? "";
+            user.email ?? "";
 
     }
 
@@ -111,7 +100,9 @@ async function protectQuizPage() {
                 const {
                     error: signOutError
                 } =
-                    await supabaseClient.auth.signOut();
+                    await supabaseClient.auth.signOut({
+                        scope: "local"
+                    });
 
 
                 if (signOutError) {
@@ -122,7 +113,6 @@ async function protectQuizPage() {
                     );
 
                     return;
-
                 }
 
 
@@ -136,7 +126,6 @@ async function protectQuizPage() {
     }
 
 }
-
 
 // ==========================
 // ログイン済みの場合
@@ -154,19 +143,18 @@ async function redirectIfLoggedIn() {
         currentPage !== "login.html" &&
         currentPage !== "register.html"
     ) {
-
         return;
-
     }
 
 
     const {
-        data: { session }
+        data: { user },
+        error
     } =
-        await supabaseClient.auth.getSession();
+        await supabaseClient.auth.getUser();
 
 
-    if (session) {
+    if (!error && user) {
 
         window.location.replace(
             "index.html"
@@ -175,7 +163,6 @@ async function redirectIfLoggedIn() {
     }
 
 }
-
 
 // ==========================
 // 実行
