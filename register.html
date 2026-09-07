@@ -3,11 +3,21 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新規登録 | 学習クイズアプリ</title>
-    <link rel="stylesheet" href="style.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        新規登録 | 学習クイズアプリ
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
 
     <style>
+
         .auth-container {
             max-width: 420px;
             margin: 60px auto;
@@ -55,7 +65,9 @@
             margin-top: 20px;
             text-align: center;
         }
+
     </style>
+
 </head>
 
 <body>
@@ -64,112 +76,268 @@
 
         <div class="auth-card">
 
-            <h1>新規登録</h1>
+            <h1>
+                新規登録
+            </h1>
 
             <div class="auth-field">
-                <label for="email">メールアドレス</label>
+
+                <label for="email">
+                    メールアドレス
+                </label>
+
                 <input
                     type="email"
                     id="email"
                     autocomplete="email"
                     required>
+
             </div>
 
             <div class="auth-field">
-                <label for="password">パスワード</label>
+
+                <label for="password">
+                    パスワード
+                </label>
+
                 <input
                     type="password"
                     id="password"
                     autocomplete="new-password"
                     minlength="6"
                     required>
+
             </div>
 
-            <button id="registerBtn" type="button">
+            <button
+                id="registerBtn"
+                type="button">
+
                 アカウントを作成
+
             </button>
 
-            <div id="message" class="auth-message"></div>
+            <div
+                id="message"
+                class="auth-message">
+            </div>
 
             <div class="auth-link">
+
                 すでにアカウントをお持ちの方は
-                <a href="login.html">ログイン</a>
+
+                <a href="login.html">
+                    ログイン
+                </a>
+
             </div>
 
         </div>
 
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Supabase JavaScript -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+
+
+    <!-- Supabase接続設定 -->
+
     <script src="auth.js"></script>
 
+
+    <!-- 新規登録処理 -->
+
     <script>
+
         const registerBtn =
-            document.getElementById("registerBtn");
+            document.getElementById(
+                "registerBtn"
+            );
 
         const message =
-            document.getElementById("message");
+            document.getElementById(
+                "message"
+            );
+
 
         registerBtn.addEventListener(
             "click",
             async () => {
 
                 const email =
-                    document.getElementById("email").value.trim();
+                    document
+                        .getElementById(
+                            "email"
+                        )
+                        .value
+                        .trim();
+
 
                 const password =
-                    document.getElementById("password").value;
+                    document
+                        .getElementById(
+                            "password"
+                        )
+                        .value;
 
-                if (!email || !password) {
+
+                // ==========================
+                // 入力チェック
+                // ==========================
+
+                if (
+                    !email ||
+                    !password
+                ) {
+
                     message.textContent =
                         "メールアドレスとパスワードを入力してください。";
+
                     return;
+
                 }
 
-                if (password.length < 6) {
+
+                if (
+                    password.length < 6
+                ) {
+
                     message.textContent =
                         "パスワードは6文字以上にしてください。";
+
                     return;
+
                 }
 
-                message.textContent = "登録中...";
 
-
-		const redirectUrl =
-		    new URL(
-		        "login.html",
-		        window.location.href
-		    ).href;
-
-		const {
-		    data,
-		    error
-		} =
-		    await supabaseClient.auth.signUp({
-		        email,
-		        password,
-		        options: {
-		            emailRedirectTo: redirectUrl
-		        }
-		    });
-
-
-                if (error) {
-                    message.textContent =
-                        "登録に失敗しました: " +
-                        error.message;
-                    return;
-                }
-
-                if (data.session) {
-                    window.location.replace("index.html");
-                    return;
-                }
+                // ==========================
+                // 登録開始
+                // ==========================
 
                 message.textContent =
-                    "確認メールを送信しました。メール内のリンクを開いてから、ログインしてください。";
+                    "登録中...";
+
+                registerBtn.disabled =
+                    true;
+
+
+                try {
+
+                    // ==========================
+                    // メール認証後の戻り先
+                    // ==========================
+
+                    const redirectUrl =
+                        new URL(
+                            "login.html",
+                            window.location.href
+                        ).href;
+
+
+                    // ==========================
+                    // Supabase 新規登録
+                    // ==========================
+
+                    const {
+                        data,
+                        error
+                    } =
+                        await supabaseClient
+                            .auth
+                            .signUp({
+
+                                email:
+                                    email,
+
+                                password:
+                                    password,
+
+                                options: {
+
+                                    emailRedirectTo:
+                                        redirectUrl
+
+                                }
+
+                            });
+
+
+                    // ==========================
+                    // エラー
+                    // ==========================
+
+                    if (error) {
+
+                        console.error(
+                            "登録エラー:",
+                            error
+                        );
+
+                        message.textContent =
+                            "登録に失敗しました: " +
+                            error.message;
+
+                        registerBtn.disabled =
+                            false;
+
+                        return;
+
+                    }
+
+
+                    // ==========================
+                    // Confirm email OFF の場合
+                    // ==========================
+
+                    if (
+                        data &&
+                        data.session
+                    ) {
+
+                        window.location.replace(
+                            "index.html"
+                        );
+
+                        return;
+
+                    }
+
+
+                    // ==========================
+                    // Confirm email ON の場合
+                    // ==========================
+
+                    message.textContent =
+                        "確認メールを送信しました。メール内のリンクを開いてから、ログインしてください。";
+
+
+                    registerBtn.disabled =
+                        false;
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "予期しないエラー:",
+                        error
+                    );
+
+                    message.textContent =
+                        "登録処理中にエラーが発生しました: " +
+                        error.message;
+
+                    registerBtn.disabled =
+                        false;
+
+                }
+
             }
         );
+
     </script>
 
 </body>
