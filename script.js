@@ -19,7 +19,7 @@ let sessionIncorrect = 0;
 let answered = false;
 
 /* ==========================
-   LocalStorage
+   Supabase 学習履歴
 ========================== */
 
 function getHistory() {
@@ -87,7 +87,14 @@ async function loadHistoryFromSupabase() {
 }
 
 
-async function saveHistory(history) {
+async function saveQuestionHistory(questionId) {
+
+    const item =
+        quizHistory[questionId];
+
+    if (!item) {
+        return;
+    }
 
     const {
         data: { user },
@@ -106,31 +113,25 @@ async function saveHistory(history) {
 
     }
 
-    const rows =
-        Object.entries(history)
-            .map(([questionId, item]) => ({
-                user_id: user.id,
-                question_id: Number(questionId),
-                correct: item.correct,
-                incorrect: item.incorrect,
-                favorite: item.favorite,
-                updated_at:
-                    new Date().toISOString()
-            }));
-
-    if (rows.length === 0) {
-
-        return;
-
-    }
-
     const {
         error
     } =
         await supabaseClient
             .from("quiz_history")
             .upsert(
-                rows,
+                {
+                    user_id: user.id,
+                    question_id:
+                        Number(questionId),
+                    correct:
+                        item.correct,
+                    incorrect:
+                        item.incorrect,
+                    favorite:
+                        item.favorite,
+                    updated_at:
+                        new Date().toISOString()
+                },
                 {
                     onConflict:
                         "user_id,question_id"
@@ -926,9 +927,7 @@ function checkAnswer(
 	}
 
 
-    saveHistory(
-        history
-    );
+saveQuestionHistory(id);
 
     updateStatistics();
 
@@ -1003,9 +1002,7 @@ function toggleFavorite() {
     history[id].favorite =
         !history[id].favorite;
 
-    saveHistory(
-        history
-    );
+saveQuestionHistory(id);
 
     updateFavoriteButton();
 
