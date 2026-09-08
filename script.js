@@ -36,16 +36,16 @@ async function loadHistoryFromSupabase() {
     } =
         await supabaseClient.auth.getUser();
 
-    if (userError || !user) {
+	if (userError || !user) {
 
-        console.error(
-            "ユーザー情報を取得できません",
-            userError
-        );
+	    console.error(
+	        "ユーザー情報を取得できません",
+	        userError
+	    );
 
-        return;
+	    return false;
 
-    }
+	}
 
     const {
         data,
@@ -61,16 +61,22 @@ async function loadHistoryFromSupabase() {
                 user.id
             );
 
-    if (error) {
+	if (error) {
 
-        console.error(
-            "学習履歴を取得できません",
-            error
-        );
+	    console.error(
+	        "学習履歴を取得できません",
+	        error
+	    );
 
-        return;
+	    alert(
+	        "学習履歴の読み込みに失敗しました。\n" +
+	        "通信状態を確認して、ページを再読み込みしてください。"
+	    );
 
-    }
+	    return false;
+
+	}
+
 
     quizHistory = {};
 
@@ -83,6 +89,8 @@ async function loadHistoryFromSupabase() {
         };
 
     });
+
+	return true;
 
 }
 
@@ -109,7 +117,7 @@ async function saveQuestionHistory(questionId) {
             userError
         );
 
-        return;
+        return false;
 
     }
 
@@ -138,14 +146,23 @@ async function saveQuestionHistory(questionId) {
                 }
             );
 
-    if (error) {
+	if (error) {
 
-        console.error(
-            "学習履歴を保存できません",
-            error
-        );
+	    console.error(
+	        "学習履歴を保存できません",
+	        error
+	    );
 
-    }
+	    alert(
+	        "学習履歴の保存に失敗しました。\n" +
+	        "通信状態を確認して、ページを再読み込みしてください。"
+	    );
+
+	    return false;
+
+	}
+
+	return true;
 
 }
 
@@ -1238,11 +1255,22 @@ async function initializeApp() {
 
     initializeCategories();
 
-    await loadHistoryFromSupabase();
+	const historyLoaded =
+	    await loadHistoryFromSupabase();
 
-    updateStatistics();
+	if (!historyLoaded) {
 
-    updateQuestionCount();
+	    console.error(
+	        "学習履歴を読み込めなかったため、初期化を中止しました。"
+	    );
+
+	    return;
+
+	}
+
+	updateStatistics();
+
+	updateQuestionCount();
 
     document.getElementById(
         "startScreen"
