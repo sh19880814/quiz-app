@@ -1,4 +1,4 @@
-const STORAGE_KEY = "quizHistory";
+let quizHistory = {};
 
 let currentQuestion = null;
 
@@ -24,22 +24,127 @@ let answered = false;
 
 function getHistory() {
 
-    const data =
-        localStorage.getItem(
-            STORAGE_KEY
-        );
+    return quizHistory;
 
-    return data
-        ? JSON.parse(data)
-        : {};
 }
 
-function saveHistory(history) {
+async function loadHistoryFromSupabase() {
 
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(history)
-    );
+    const {
+        data: { user },
+        error: userError
+    } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+
+        console.error(
+            "ユーザー情報を取得できません",
+            userError
+        );
+
+        return;
+
+    }
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("quiz_history")
+            .select(
+                "question_id, correct, incorrect, favorite"
+            )
+            .eq(
+                "user_id",
+                user.id
+            );
+
+    if (error) {
+
+        console.error(
+            "学習履歴を取得できません",
+            error
+        );
+
+        return;
+
+    }
+
+    quizHistory = {};
+
+    data.forEach(row => {
+
+        quizHistory[row.question_id] = {
+            correct: row.correct,
+            incorrect: row.incorrect,
+            favorite: row.favorite
+        };
+
+    });
+
+}
+
+
+async function saveHistory(history) {
+
+    const {
+        data: { user },
+        error: userError
+    } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+
+        console.error(
+            "ユーザー情報を取得できません",
+            userError
+        );
+
+        return;
+
+    }
+
+    const rows =
+        Object.entries(history)
+            .map(([questionId, item]) => ({
+                user_id: user.id,
+                question_id: Number(questionId),
+                correct: item.correct,
+                incorrect: item.incorrect,
+                favorite: item.favorite,
+                updated_at:
+                    new Date().toISOString()
+            }));
+
+    if (rows.length === 0) {
+
+        return;
+
+    }
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("quiz_history")
+            .upsert(
+                rows,
+                {
+                    onConflict:
+                        "user_id,question_id"
+                }
+            );
+
+    if (error) {
+
+        console.error(
+            "学習履歴を保存できません",
+            error
+        );
+
+    }
 
 }
 
@@ -1132,23 +1237,31 @@ document
    初期化
 ========================== */
 
-initializeCategories();
+async function initializeApp() {
 
-updateStatistics();
+    initializeCategories();
 
-updateQuestionCount();
+    await loadHistoryFromSupabase();
 
-document.getElementById(
-    "startScreen"
-).style.display =
-    "block";
+    updateStatistics();
 
-document.getElementById(
-    "quizScreen"
-).style.display =
-    "none";
+    updateQuestionCount();
 
-document.getElementById(
-    "finishScreen"
-).style.display =
-    "none";
+    document.getElementById(
+        "startScreen"
+    ).style.display =
+        "block";
+
+    document.getElementById(
+        "quizScreen"
+    ).style.display =
+        "none";
+
+    document.getElementById(
+        "finishScreen"
+    ).style.display =
+        "none";
+
+}
+
+initializeApp();
